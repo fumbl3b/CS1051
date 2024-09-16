@@ -12,3 +12,9 @@ def leibniz_series(terms):
 
 approx_pi = leibniz_series(terms)
 print(f"Approximation of pi using {terms} terms: {approx_pi}")
+
+def leibniz_harry(terms):
+    holder = 0
+    for i in range(terms):
+        holder += (-1)**i / (2*i + 1)
+        print(holder)

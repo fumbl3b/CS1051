@@ -16,9 +16,16 @@ def matrix_stream(stdscr):
     tick_count = 0
 
     while True:
+        # Re-fetch screen dimensions in case the terminal was resized
+        height, width = stdscr.getmaxyx()
+
         stdscr.clear()
 
         for i, column in enumerate(columns):
+            # Ensure column index is within current terminal width
+            if i >= width:
+                continue
+
             if tick_count % column['delay'] == 0:
                 # Move the column position down
                 if column['y'] < height - 1:
@@ -35,12 +42,12 @@ def matrix_stream(stdscr):
                     column['trail'].pop()
 
                 # Draw the current character in bright green if within bounds
-                if column['y'] < height:
+                if 0 <= column['y'] < height:
                     stdscr.addstr(column['y'], i, char, curses.color_pair(1))
 
             # Draw the trailing characters with decreasing brightness
             for j, trail_char in enumerate(column['trail'][1:], start=1):
-                if trail_char['y'] < height:
+                if 0 <= trail_char['y'] < height:
                     stdscr.addstr(trail_char['y'], i, trail_char['char'], curses.color_pair(min(4, j)))
 
             # If the column reaches the bottom, reset to top
