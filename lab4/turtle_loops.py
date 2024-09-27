@@ -22,14 +22,26 @@ def drawGrid(t: turtle.Turtle, size: int = 5, squareSize: int = 50):
         t.pendown()
         t.right(90)
 
+def drawSquareStairs(t: turtle.Turtle, height: int = 5, squareSize: int = 50) -> None:
+    for i in range(height,0,-1):
+        drawRow(t, i, squareSize)
+        t.left(180)
+        t.forward(squareSize*i)
+
+        t.right(90)
+        t.penup()
+        t.forward(squareSize)
+        t.pendown()
+        t.right(90)
 
 screen = turtle.Screen()
 my_turtle = turtle.Turtle()
 my_turtle.speed(10)
 
-drawGrid(my_turtle)
+# drawSquareStairs(my_turtle, squareSize= 30)
+drawGrid(my_turtle, size=3, squareSize=30)
 my_turtle.penup()
-my_turtle.setpos(0,0)
+my_turtle.setpos(0,-30)
 
 # my_turtle.forward(50)
 # my_turtle.right(90)
