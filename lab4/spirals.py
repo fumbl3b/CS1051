@@ -3,33 +3,34 @@ import math
 
 screen = turtle.Screen()
 turt = turtle.Turtle()
-turt.speed(5)
+turt.speed(10)
 
-def drawNgon(t: turtle.Turtle, numSides: int, sideLength: int) -> None:
+def drawNgon(t: turtle.Turtle, numSides: int, sideLength: int, angleOffset: float) -> None:
+    t.right(angleOffset)
+
     angle = 360 / numSides
-    for i in range(numSides):
+    for _ in range(numSides):
         t.forward(sideLength)
         t.right(angle)
 
-def drawNgonSpiral(t, numSides, sideLength, numShapes) -> None:
-    for shape in range(numShapes):
-        drawNgon(t, numSides, sideLength)
-        offset = sideLength/numShapes
-        t.right(2*math.tan(math.pi/numSides))
-        t.forward(-offset)
+def drawNgonSpiral(t: turtle.Turtle, numSides: int, sideLength: int, numShapes: int) -> None:
+    for i in range(numShapes):
+        angleOffset = (360 / numShapes) * i
 
-def centerShape(t: turtle.Turtle, numSides: int, sideLength: int) -> None:
-    radius = sideLength / (2 * math.sin(math.pi / numSides))
-    t.penup()
-    t.goto(-sideLength / 2, radius)  # Adjust the starting position
-    t.setheading(0)  # Face to the right
-    t.pendown()
+        # Center the turtle
+        t.penup()
+        t.goto(0, 0)
+        t.setheading(0)
+        t.pendown()
 
-side_length = 130
-num_sides = 11
-num_shapes = 3
+        drawNgon(t, numSides, sideLength, angleOffset)
 
-centerShape(turt, num_sides, side_length)
+# Parameters for the spiral
+side_length = 60
+num_sides = 17
+num_shapes = 10
+
+# Draw the spiral of polygons
 drawNgonSpiral(turt, num_sides, side_length, num_shapes)
 
 screen.mainloop()
