@@ -4,6 +4,7 @@ import math
 screen = turtle.Screen()
 turt = turtle.Turtle()
 turt.speed(10)
+turt.shape("blank")
 
 def drawNgon(t: turtle.Turtle, numSides: int, sideLength: int, angleOffset: float) -> None:
     t.right(angleOffset)
