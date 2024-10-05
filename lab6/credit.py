@@ -1,27 +1,43 @@
-with open('example_cards.txt', 'r') as file:
-    valid_cards = [line.strip() for line in file.readlines()]
+def luhn(card_number: str) -> bool:
+    split_nums = list(card_number)
 
-# Luhn's algorithm'
+    nums_to_double = []
 
-def luhn(card_number: int) -> bool:
-    value = list(str(card_number))
+    for i in range(len(split_nums) - 2, -1, -2):
+        nums_to_double.append(split_nums.pop(i))
 
-    # Start with second to last digit
-    # for digit in value[::-2]
+    doubled = list(map(lambda n: int(n)*2, list(nums_to_double)))
 
-    for i in value[-2::-2]:
-        print(i, end="")
-    print("")
-    return True
+    digits = []
+    for n in doubled:
+        for digit in str(n):
+            digits.append(int(digit))
+
+    doubled_sum = sum(digits)
+    final_checksum = doubled_sum + sum(map(lambda n: int(n), split_nums))
+
+    return (final_checksum % 10 == 0)
+
+def get_card_type(card_num):
+    response = "Card Type not detected"
+    if len(card_num) == 15:
+        if card_num[0] == '3':
+            response = "American Express"
+        elif card_num[0] == '4':
+            response = "VISA"
+    elif len(card_num) == 16:
+        response = "MasterCard"
+    return response
 
 
-# for card in valid_cards:
-    # print(card)
-    # luhn(int(card))
+card_number = None
 
-test_list = [1,2,3,4,5,6,7,8,9,10]
-str_list = list(map(str, test_list))
-print(' '.join(str_list))
-for n in test_list[-2::-2]:
-    print(n, end=' ')
-print("")
+while not card_number:
+    user_input = input("Number: ")
+    if user_input.isdigit():
+        card_number = user_input
+
+if luhn(card_number):
+    print(f"{card_number}: Valid CC number", get_card_type(card_number), sep="\n")
+else:
+    print(f"{card_number}: Invalid CC number")
