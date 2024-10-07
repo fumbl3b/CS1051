@@ -74,10 +74,24 @@ def irma():
     """Animates the path of hurricane Irma
     """
     import csv
+    import os
+
     (t, wn, map_bg_img) = irma_setup()
     t.pendown()
 
-    with open('data/irma.csv', 'r') as file:
+    hurricane = ''
+    while not hurricane:
+        file_list = os.listdir('./data')
+        file_list = [file for file in file_list if os.path.isfile(os.path.join('./data', file))]
+        user = input("which hurricane would you like to select? (type list for list)")
+        if user == "list":
+            for file in file_list:
+                name = file.split('.')[0]
+                print(name)
+        elif (user + '.csv') in file_list:
+            hurricane = user + '.csv'
+
+    with open(f"data/{hurricane}", 'r') as file:
         reader = list(csv.reader(file))
         for i in range(1,len(reader)):
             # Lat is 2, Lon is 3, Wind Speed is 4
