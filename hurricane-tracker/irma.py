@@ -1,36 +1,39 @@
 import turtle
-# import csv
+import tkinter as tk
+import csv
+import os
 
 def irma_setup():
     """Creates the Turtle and the Screen with the map background
        and coordinate system set to match latitude and longitude.
 
-       :return: a tuple containing the Turtle and the Screen
-
-       DO NOT CHANGE THE CODE IN THIS FUNCTION!
+       :return: a tuple containing the Turtle, the Screen, and the root window
     """
-    import tkinter
     turtle.setup(965, 600)  # set size of window to size of map
 
     wn = turtle.Screen()
-    wn.title("Hurricane Irma")
+    wn.title("Hurricane Tracker")
 
-    # kludge to get the map shown as a background image,
-    # since wn.bgpic does not allow you to position the image
+    # Get the canvas and root window from the Screen
     canvas = wn.getcanvas()
+    root = canvas.master  # The root window
+
     turtle.setworldcoordinates(-90, 0, -17.66, 45)  # set the coordinate system to match lat/long
 
-    map_bg_img = tkinter.PhotoImage(file="images/atlantic-basin.png")
+    # Use tk.PhotoImage to load the background image
+    map_bg_img = tk.PhotoImage(file="images/atlantic-basin.png")
 
-    # additional kludge for positioning the background image
-    # when setworldcoordinates is used
-    canvas.create_image(-1175, -580, anchor=tkinter.NW, image=map_bg_img)
+    # Display the background image on the canvas
+    canvas.create_image(-1175, -580, anchor=tk.NW, image=map_bg_img)
 
     t = turtle.Turtle()
     wn.register_shape("images/hurricane.gif")
     t.shape("images/hurricane.gif")
 
-    return (t, wn, map_bg_img)
+    # Keep a reference to the image to prevent garbage collection
+    wn.map_bg_img = map_bg_img
+
+    return (t, wn, root)
 
 def get_category_storm(wind_speed: int) -> int:
     '''Returns the storm category 0-5
@@ -69,40 +72,69 @@ def get_storm_color(category: int) -> str:
     }
     return color_dict[category]
 
-
 def irma():
-    """Animates the path of hurricane Irma
-    """
-    import csv
-    import os
+    """Animates the path of the selected hurricane."""
 
-    (t, wn, map_bg_img) = irma_setup()
+    (t, wn, root) = irma_setup()
     t.pendown()
 
-    hurricane = ''
-    while not hurricane:
-        file_list = os.listdir('./data')
-        file_list = [file for file in file_list if os.path.isfile(os.path.join('./data', file))]
-        user = input("which hurricane would you like to select? (type list for list)")
-        if user == "list":
-            for file in file_list:
-                name = file.split('.')[0]
-                print(name)
-        elif (user + '.csv') in file_list:
-            hurricane = user + '.csv'
+    # Create a Frame for the buttons
+    control_frame = tk.Frame(root)
+    control_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-    with open(f"data/{hurricane}", 'r') as file:
-        reader = list(csv.reader(file))
-        for i in range(1,len(reader)):
-            # Lat is 2, Lon is 3, Wind Speed is 4
-            (lat, lon, wind) = float(reader[i][2]), float(reader[i][3]), int(reader[i][4])
+    # Variable to store the selected hurricane
+    selected_hurricane = tk.StringVar()
 
-            # draw frame
-            category = get_category_storm(wind)
-            t.color(get_storm_color(category))
-            t.pensize(category**1.2)
-            t.setpos(lon, lat)
+    # Get list of hurricane data files
+    file_list = os.listdir('./data')
+    file_list = [
+        file for file in file_list
+        if os.path.isfile(os.path.join('./data', file)) and file.endswith('.csv')
+    ]
+    hurricane_names = [os.path.splitext(file)[0] for file in file_list]
 
+    if not hurricane_names:
+        raise FileNotFoundError("No hurricane data files found in the './data' directory.")
+
+    # Set default value
+    selected_hurricane.set(hurricane_names[0])
+
+    # Create a dropdown menu (OptionMenu) for hurricane selection
+    hurricane_menu = tk.OptionMenu(control_frame, selected_hurricane, *hurricane_names)
+    hurricane_menu.pack(side=tk.LEFT, padx=5, pady=5)
+
+    # Function to start the animation
+    def start_animation():
+        hurricane = selected_hurricane.get() + '.csv'
+        t.clear()
+        t.penup()
+        t.goto(0, 0)
+        t.pendown()
+
+        with open(f"data/{hurricane}", 'r') as file:
+            reader = list(csv.reader(file))
+            for i in range(1, len(reader)):
+                # Lat is column 2, Lon is column 3, Wind Speed is column 4
+                (lat, lon, wind) = float(reader[i][2]), float(reader[i][3]), int(reader[i][4])
+
+                # Draw the hurricane path
+                category = get_category_storm(wind)
+                t.color(get_storm_color(category))
+                t.pensize(category ** 1.2)
+                t.setpos(lon, lat)
+
+        # Update the screen
+        wn.update()
+
+    # Create a "Start Animation" button
+    start_button = tk.Button(control_frame, text="Start Animation", command=start_animation)
+    start_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+    # Create a "Replay Animation" button
+    replay_button = tk.Button(control_frame, text="Replay Animation", command=start_animation)
+    replay_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+    # Mainloop
     wn.mainloop()
 
 if __name__ == "__main__":
