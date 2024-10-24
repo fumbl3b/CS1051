@@ -110,6 +110,7 @@ def irma():
         t.penup()
         t.goto(0, 0)
         t.pendown()
+        t.speed(10)
 
         with open(f"data/{hurricane}", 'r') as file:
             reader = list(csv.reader(file))
