@@ -1,4 +1,5 @@
 import constants
+from colorama import Fore, Style
 
 def validate_characters(string: str) -> bool:
     valid_hawaiian = {
@@ -20,7 +21,7 @@ def yes_no(string: str) -> bool:
 def application():
     valid_input = ""
     while len(valid_input) == 0:
-        user_input = input(constants.INPUT_PROMPT)
+        user_input = input(Fore.CYAN + constants.INPUT_PROMPT + Style.RESET_ALL)
         if validate_characters(user_input):
             valid_input = user_input.rstrip()
 
@@ -56,16 +57,16 @@ def application():
         pronounce += ' '
 
     pronounce = pronounce.strip()
-    print(valid_input, constants.IS_PRONOUNCED, pronounce)
+    print(Fore.GREEN + valid_input + Style.RESET_ALL, constants.IS_PRONOUNCED, Fore.YELLOW + pronounce + Style.RESET_ALL)
 
     while True:
-        again_input = input(constants.AGAIN_PROMPT)
+        again_input = input(Fore.CYAN + constants.AGAIN_PROMPT + Style.RESET_ALL)
         if yes_no(again_input):
             return False
         elif again_input.lower().strip() in ['n', 'no']:
             return True
         else:
-            print("Invalid input. Please enter 'yes' or 'no'.")
+            print(Fore.RED + "Invalid input. Please enter 'yes' or 'no'." + Style.RESET_ALL)
 
 def main():
     end = False
