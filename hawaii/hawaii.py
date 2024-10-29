@@ -32,7 +32,7 @@ def application():
     for word in words:
         prev_char = None
         skip = False
-        for idx,char in enumerate(word):
+        for idx, char in enumerate(word):
             if skip:
                 skip = False
                 continue
@@ -87,11 +87,11 @@ def application():
             else:
                 pronounce += char
             prev_char = char
-            if idx == len(word) - 1 and pronounce[-1] == '-':
-                pronounce = pronounce[:-1]
+        if pronounce.endswith('-'):
+            pronounce = pronounce[:-1]
         pronounce += ' '
 
-    if pronounce[-1] == '-': pronounce = pronounce[:-1]
+    pronounce = pronounce.strip()
     print(valid_input, strings.IS_PRONOUNCED, pronounce)
 
     if yes_no(input(strings.AGAIN_PROMPT)): return False
